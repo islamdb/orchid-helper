@@ -1,6 +1,6 @@
 <?php
 
-namespace IslamDB\OrchidHelper\Actions;
+namespace IslamDB\OrchidHelper\Resource\Actions;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
