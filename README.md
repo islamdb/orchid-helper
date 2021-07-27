@@ -1,6 +1,6 @@
 ## Introduction
 
-Orchid Helper has class and traits that will help you a lot
+Orchid Helper has class and traits that will help you a lot in development
 
 ## Installation
 
@@ -9,7 +9,7 @@ Orchid Helper has class and traits that will help you a lot
 You can install the package using the Сomposer. Run this at the command line:
 
 ```php
-$ composer require islamdb/orchid-helper
+composer require islamdb/orchid-helper
 ```
 
 This will update `composer.json` and install the package into the `vendor/` directory.
