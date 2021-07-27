@@ -4,9 +4,7 @@
 namespace IslamDB\OrchidHelper\Resource\Traits;
 
 
-use Illuminate\Support\Str;
-use IslamDB\OrchidHelper\Actions\DeleteAction;
-use ReflectionClass;
+use IslamDB\OrchidHelper\Resource\Actions\DeleteAction;
 
 trait ResourceDeleteAction
 {
