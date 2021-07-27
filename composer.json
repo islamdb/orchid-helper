@@ -1,0 +1,22 @@
+{
+    "name": "islamdb/orchid-helper",
+    "description": "Helper for orchid platform",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "islamdb",
+            "email": "islamdbrnd@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "orchid/platform": "^10.*",
+        "orchid/crud": "^3.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "IslamDB\\OrchidHelper": "src/"
+        }
+    }
+}
