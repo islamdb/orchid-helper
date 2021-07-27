@@ -11,7 +11,7 @@ trait ResourceDefaultFilter
     /**
      * @var string
      */
-    protected $defaultSortedColumn = 'created_at';
+    protected $defaultSortedColumn = 'id';
 
     /**
      * @var string
