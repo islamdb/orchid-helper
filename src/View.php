@@ -4,6 +4,7 @@
 namespace IslamDB\OrchidHelper;
 
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Orchid\Screen\Sight;
 
@@ -32,7 +33,12 @@ class View
     {
         return View::make($name, $title)
             ->render(function ($model) use ($column, $name) {
-                return $model->{$name}->pluck($column)->join(', ');
+                $data = $model->{$name};
+                if (!is_a($data, Collection::class)) {
+                    $data = collect([$data]);
+                }
+
+                return $data->pluck($column)->join(', ');
             });
     }
 
