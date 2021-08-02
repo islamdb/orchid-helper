@@ -35,6 +35,10 @@ class Column
      */
     public static function relation(string $name, string $title = null, $columns = 'name', string $glue = ', ', string $glueColumn = ' ')
     {
+        $columns = is_array($columns)
+            ? $columns
+            : [$columns];
+
         return static::make($name, $title, false, null)
             ->render(function ($model) use ($columns, $name, $glue, $glueColumn) {
                 $data = $model->{$name};
