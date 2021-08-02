@@ -39,7 +39,7 @@ class DefaultFilter extends Filter
                             return $k == $this->request->{$datum['param']}
                                 ? 'aaa'
                                 : ($k != 'all' ? "zzz$k" : 'all');
-                        });
+                        }, SORT_NATURAL);
                     });
 
                 return $datum;
