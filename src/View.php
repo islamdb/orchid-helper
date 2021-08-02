@@ -6,10 +6,25 @@ namespace IslamDB\OrchidHelper;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Sight;
 
 class View
 {
+    /**
+     * @param string $name
+     * @param string|null $title
+     * @return \Orchid\Screen\Cell|Sight
+     */
+    public static function url(string $name, string $title = null)
+    {
+        return static::make($name, $title)
+            ->render(function ($model) use ($name) {
+                return Link::make($model->{$name})
+                    ->href($model->{$name})->target('_blank');
+            });
+    }
+
     /**
      * @param string $name
      * @param string|null $title
@@ -26,19 +41,38 @@ class View
     /**
      * @param string $name
      * @param string|null $title
-     * @param string $column
+     * @param string $columns
+     * @param string $glue
+     * @param string $glueColumn
      * @return \Orchid\Screen\Cell|Sight
      */
-    public static function relation(string $name, string $title = null, $column = 'name')
+    public static function relation(string $name, string $title = null, $columns = 'name', string $glue = ', ', string $glueColumn = ' ')
     {
+        $columns = is_array($columns)
+            ? $columns
+            : [$columns];
+
         return View::make($name, $title)
-            ->render(function ($model) use ($column, $name) {
+            ->render(function ($model) use ($columns, $name, $glue, $glueColumn) {
                 $data = $model->{$name};
                 if (!is_a($data, Collection::class)) {
                     $data = collect([$data]);
                 }
 
-                return $data->pluck($column)->join(', ');
+                $data = $data->map(function ($row) use ($columns, $glueColumn) {
+                    $row = $row->toArray();
+                    $row['_'] = '';
+                    foreach ($columns as $column) {
+                        if (isset($row[$column])) {
+                            $row['_'] .= $row[$column].$glueColumn;
+                        }
+                    }
+                    $row['_'] = substr($row['_'], 0, -strlen($glueColumn));
+
+                    return $row;
+                });
+
+                return $data->pluck('_')->join($glue);
             });
     }
 
@@ -84,7 +118,7 @@ class View
     {
         return static::make($name, $title)
             ->render(function ($model) use ($locale, $name, $withTime, $withDayName){
-                return readable_datetime($model->{$name}, $locale, $withTime, $withDayName);
+                return Helper::readableDatetime($model->{$name}, $locale, $withTime, $withDayName);
             });
     }
 

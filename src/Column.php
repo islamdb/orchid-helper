@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\TD;
-use ReflectionClass;
+use IslamDB\OrchidHelper\Helper;
 
 class Column
 {
     /**
      * @param string $name
      * @param string|null $title
+     * @return \Orchid\Screen\Cell|TD
      */
     public static function url(string $name, string $title = null)
     {
@@ -28,19 +29,34 @@ class Column
     /**
      * @param string $name
      * @param string|null $title
-     * @param string $column
+     * @param string $columns
+     * @param string $glue
+     * @param string $glueColumn
      * @return \Orchid\Screen\Cell|TD
      */
-    public static function relation(string $name, string $title = null, $column = 'name')
+    public static function relation(string $name, string $title = null, $columns = 'name', string $glue = ', ', string $glueColumn = ' ')
     {
         return static::make($name, $title, false, null)
-            ->render(function ($model) use ($column, $name) {
+            ->render(function ($model) use ($columns, $name, $glue, $glueColumn) {
                 $data = $model->{$name};
                 if (!is_a($data, Collection::class)) {
                     $data = collect([$data]);
                 }
 
-                return $data->pluck($column)->join(', ');
+                $data = $data->map(function ($row) use ($columns, $glueColumn) {
+                    $row = $row->toArray();
+                    $row['_'] = '';
+                    foreach ($columns as $column) {
+                        if (isset($row[$column])) {
+                            $row['_'] .= $row[$column].$glueColumn;
+                        }
+                    }
+                    $row['_'] = substr($row['_'], 0, -strlen($glueColumn));
+
+                    return $row;
+                });
+
+                return $data->pluck('_')->join($glue);
             });
     }
 
@@ -79,7 +95,7 @@ class Column
     {
         return static::make($name, $title)
             ->render(function ($model) use ($locale, $name, $withTime, $withDayName){
-                return readable_datetime($model->{$name}, $locale, $withTime, $withDayName);
+                return Helper::readableDatetime($model->{$name}, $locale, $withTime, $withDayName);
             })
             ->filter(TD::FILTER_DATE);
     }
