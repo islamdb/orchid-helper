@@ -55,24 +55,29 @@ class View
         return View::make($name, $title)
             ->render(function ($model) use ($columns, $name, $glue, $glueColumn) {
                 $data = $model->{$name};
-                if (!is_a($data, Collection::class)) {
-                    $data = collect([$data]);
+
+                if (!empty($data)) {
+                    if (!is_a($data, Collection::class)) {
+                        $data = collect([$data]);
+                    }
+
+                    $data = $data->map(function ($row) use ($columns, $glueColumn, $model) {
+                        $row = $row->toArray();
+                        $row['_'] = '';
+                        foreach ($columns as $column) {
+                            if (isset($row[$column])) {
+                                $row['_'] .= $row[$column].$glueColumn;
+                            }
+                        }
+                        $row['_'] = substr($row['_'], 0, -strlen($glueColumn));
+
+                        return $row;
+                    });
+
+                    return $data->pluck('_')->join($glue);
                 }
 
-                $data = $data->map(function ($row) use ($columns, $glueColumn) {
-                    $row = $row->toArray();
-                    $row['_'] = '';
-                    foreach ($columns as $column) {
-                        if (isset($row[$column])) {
-                            $row['_'] .= $row[$column].$glueColumn;
-                        }
-                    }
-                    $row['_'] = substr($row['_'], 0, -strlen($glueColumn));
-
-                    return $row;
-                });
-
-                return $data->pluck('_')->join($glue);
+                return '';
             });
     }
 
