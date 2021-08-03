@@ -97,10 +97,11 @@ class DefaultFilter extends Filter
         foreach ($this->data as $title => $datum) {
             $param = $this->request->{$datum['param']};
             if (!empty($param) and $param != 'all') {
-                $text .= $title.': '.$datum['model']
-                    ->where($datum['key'], $this->request->{$datum['param']})
-                    ->first()
-                    ->{$datum['name']}.' | ';
+                $text .= $title.': '.$datum['options']
+                        ->filter(function ($option, $key) use ($param) {
+                            return $key == $param;
+                        })
+                        ->first().' | ';
             }
         }
         $text = !empty($text)
