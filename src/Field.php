@@ -49,6 +49,8 @@ class Field
             'step' => "1"
         ], Select::class => [
             'options' => "['one' => 'One', 'two' => 'Two', 'three' => 'Three']"
+        ], Picture::class => [
+            'targetId' => ''
         ]
     ];
 
