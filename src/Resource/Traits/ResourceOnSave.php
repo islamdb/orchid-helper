@@ -15,7 +15,7 @@ trait ResourceOnSave
      * @param string $referencedColumn
      * @param string $column
      */
-    public function sluggable($request, $referencedColumn = 'title', $column = 'slug')
+    public function sluggable($request, string $referencedColumn = 'title', string $column = 'slug')
     {
         if (empty($request->{$column})){
             $request->merge([
@@ -31,7 +31,7 @@ trait ResourceOnSave
      * @param $model
      * @param string $name
      */
-    public function saveWithAttachment($request, $model, $name = 'attachment')
+    public function saveWithAttachment($request, $model, string $name = 'attachment')
     {
         $attachmentIds = $request->input($name, []);
         $request->request

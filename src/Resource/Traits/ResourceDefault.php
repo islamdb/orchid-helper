@@ -4,7 +4,6 @@
 namespace IslamDB\OrchidHelper\Resource\Traits;
 
 
-use Orchid\Crud\Filters\DefaultSorted;
 
 trait ResourceDefault
 {

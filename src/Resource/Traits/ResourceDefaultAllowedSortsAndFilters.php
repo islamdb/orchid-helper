@@ -26,7 +26,7 @@ trait ResourceDefaultAllowedSortsAndFilters
      *
      * @param string[] $columnAdditions
      */
-    protected function setAllowedSortsAndFilters($columnAdditions = ['created_at', 'updated_at'])
+    protected function setAllowedSortsAndFilters(array $columnAdditions = ['created_at', 'updated_at'])
     {
         $this->allowedSorts = array_merge(
             $this->fillable,

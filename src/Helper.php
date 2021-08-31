@@ -14,7 +14,7 @@ class Helper
      * @param string $suffix
      * @return string
      */
-    public static function arrayToString($array, $splitter = ', ', $lastSplitter = ' and ', $prefix = '', $suffix = '')
+    public static function arrayToString($array, string $splitter = ', ', string $lastSplitter = ' and ', string $prefix = '', string $suffix = ''): string
     {
         $string = implode($splitter, $array);
         $string = str_replace($splitter . last($array), $lastSplitter . last($array), $string);
@@ -29,7 +29,7 @@ class Helper
      * @param bool $withDayName
      * @return string
      */
-    public static function readableDatetime($datetime, $locale = 'id', $withTime = true, $withDayName = true)
+    public static function readableDatetime($datetime, string $locale = 'id', bool $withTime = true, bool $withDayName = true)
     {
         $format = 'dddd, MMMM Do YYYY, HH:mm:ss';
         $localeFormats = [

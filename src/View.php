@@ -4,41 +4,50 @@
 namespace IslamDB\OrchidHelper;
 
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use Orchid\Screen\Actions\Link;
+use IslamDB\OrchidHelper\Traits\Type;
 use Orchid\Screen\Sight;
 
 class View
 {
+    use Type;
+
     /**
+     * Use this function to generate url in view page
+     * example :
+     * 1. View::url('social_media_url', null, null)
+     * 2. View::url('social_media_url', null, '_blank')
+     * output :
+     * 1. (clickable and go to address in current tab)
+     * 2. (clickable and go to address in new tab)
+     *
+     * @param string $name
+     * @param string|null $title
+     * @param string $target
+     * @return \Orchid\Screen\Cell|Sight
+     */
+
+    /**
+     * This function will help you to print html
+     * example :
+     * View::html('body')
+     * output :
+     * <b>Bold Text</b> (in html)
+     *
      * @param string $name
      * @param string|null $title
      * @return \Orchid\Screen\Cell|Sight
      */
-    public static function url(string $name, string $title = null)
-    {
-        return static::make($name, $title)
-            ->render(function ($model) use ($name) {
-                return Link::make($model->{$name})
-                    ->href($model->{$name})->target('_blank');
-            });
-    }
 
     /**
-     * @param string $name
-     * @param string|null $title
-     * @return \Orchid\Screen\Cell|Sight
-     */
-    public static function html(string $name, string $title = null)
-    {
-        return View::make($name, $title)
-            ->render(function ($model) use ($name) {
-                return $model->{$name};
-            });
-    }
-
-    /**
+     * This function will help you to print out the relation fields
+     * example :
+     * assume that you want to get users with their roles
+     * and roles are (super admin and administrator)
+     * View::relation('roles', null, ['name', 'slug'], ', ', ' - ')
+     * output :
+     * Super Admin - super-admin, Administrator - administrator
+     *
      * @param string $name
      * @param string|null $title
      * @param string $columns
@@ -46,42 +55,14 @@ class View
      * @param string $glueColumn
      * @return \Orchid\Screen\Cell|Sight
      */
-    public static function relation(string $name, string $title = null, $columns = 'name', string $glue = ', ', string $glueColumn = ' ')
-    {
-        $columns = is_array($columns)
-            ? $columns
-            : [$columns];
-
-        return View::make($name, $title)
-            ->render(function ($model) use ($columns, $name, $glue, $glueColumn) {
-                $data = $model->{$name};
-
-                if (!empty($data)) {
-                    if (!is_a($data, Collection::class)) {
-                        $data = collect([$data]);
-                    }
-
-                    $data = $data->map(function ($row) use ($columns, $glueColumn, $model) {
-                        $row = $row->toArray();
-                        $row['_'] = '';
-                        foreach ($columns as $column) {
-                            if (isset($row[$column])) {
-                                $row['_'] .= $row[$column].$glueColumn;
-                            }
-                        }
-                        $row['_'] = substr($row['_'], 0, -strlen($glueColumn));
-
-                        return $row;
-                    });
-
-                    return $data->pluck('_')->join($glue);
-                }
-
-                return '';
-            });
-    }
 
     /**
+     * This function will help you to make column with default title
+     * example :
+     * View::make('full_name')
+     * output :
+     * (view with "Full Name")
+     *
      * @param string $name
      * @param string|null $title
      * @return \Orchid\Screen\Cell|Sight
@@ -94,6 +75,12 @@ class View
     }
 
     /**
+     * This function will help you to print out the boolean value
+     * example :
+     * View::boolean('enabled', 'Is Active', [true => 'Yes', false => 'No'])
+     * output :
+     * Yes/No (depand on your value)
+     *
      * @param $name
      * @param null $title
      * @param array|null $labels
@@ -112,6 +99,12 @@ class View
     }
 
     /**
+     * This function will help you to print out datetime/timestamp
+     * example :
+     * View::dateTime('updated_at', 'Last Edit', 'en', true, true)
+     * output :
+     * Tuesday, August 31st 2021, 09:05:38 (depand on your value)
+     *
      * @param $name
      * @param null $title
      * @param string $locale
@@ -119,36 +112,32 @@ class View
      * @param bool $withDayName
      * @return \Orchid\Screen\Cell|Sight
      */
-    public static function dateTime($name, $title = null, string $locale = 'id', $withTime = true, $withDayName = true)
-    {
-        return static::make($name, $title)
-            ->render(function ($model) use ($locale, $name, $withTime, $withDayName){
-                return Helper::readableDatetime($model->{$name}, $locale, $withTime, $withDayName);
-            });
-    }
 
     /**
+     * This function will help you to print numeric/money value
+     * example :
+     * assume total = 250000.23
+     * 1. View::make('total', null, 4, true)
+     * 2. View::make('total', null, 4, false)
+     * output :
+     * 1. 250,000.23
+     * 2. 250,000.2300
+     *
      * @param $name
      * @param null $title
-     * @return \Orchid\Screen\Cell|Sight
+     * @param int $decimals
+     * @param bool $zeroTrail
+     * @param string $decimalSeparator
+     * @param string $thousandSeparator
+     * @return mixed
      */
-    public static function money($name, $title = null)
-    {
-        return static::make($name, $title)
-            ->render(function ($model) use ($name) {
-                return number_format(
-                    $model->{$name},
-                    2,
-                    ',',
-                    '.'
-                );
-            });
-    }
 
     /**
+     * Meta field array
+     *
      * @return array
      */
-    public static function meta()
+    public static function meta(): array
     {
         return [
             static::make('meta_title'),
@@ -158,9 +147,11 @@ class View
     }
 
     /**
+     * Timestamp array
+     *
      * @return array
      */
-    public static function timestamps()
+    public static function timestamps(): array
     {
         return [
             static::dateTime('created_at'),
@@ -169,28 +160,34 @@ class View
     }
 
     /**
+     * Set view with meta
+     *
      * @param array $views
      * @return array|\Orchid\Screen\Cell[]|Sight[]
      */
-    public static function withMeta(array $views)
+    public static function withMeta(array $views): array
     {
         return array_merge($views, static::meta());
     }
 
     /**
+     * Set view with timestamp
+     *
      * @param array $views
      * @return array|\Orchid\Screen\Cell[]|Sight[]
      */
-    public static function withTimestamps(array $views)
+    public static function withTimestamps(array $views): array
     {
         return array_merge($views, static::timestamps());
     }
 
     /**
+     * Set view with meta and timestamp
+     *
      * @param array $view
      * @return array
      */
-    public static function withMetaAndTimestamps(array $view)
+    public static function withMetaAndTimestamps(array $view): array
     {
         return array_merge($view, static::meta(), static::timestamps());
     }

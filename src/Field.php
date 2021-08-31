@@ -223,9 +223,10 @@ class Field
      *
      * @param $type
      * @param string $name
+     * @param array $options
      * @return mixed
      */
-    public static function make($type, $name = 'value', $options = [])
+    public static function make($type, string $name = 'value', array $options = [])
     {
         return rescue(function () use ($type, $name, $options) {
             $field = $type::make($name);
