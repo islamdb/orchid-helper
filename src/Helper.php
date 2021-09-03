@@ -49,4 +49,21 @@ class Helper
             ->locale($locale)
             ->isoFormat($format);
     }
+
+    /**
+     * @param $object
+     * @param $methods
+     * @return mixed
+     */
+    public static function chainedMethodCall($object, $methods)
+    {
+        $callStr = 'return $object->';
+        foreach($methods as $method => $param){
+            $callStr.= "$method($param)->";
+        }
+        $callStr = substr($callStr, 0, -2);
+        $callStr.= ';';
+
+        return eval($callStr);
+    }
 }

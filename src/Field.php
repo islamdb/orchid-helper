@@ -230,7 +230,7 @@ class Field
     {
         return rescue(function () use ($type, $name, $options) {
             $field = $type::make($name);
-            $field = chained_method_call($field, $options);
+            $field = Helper::chainedMethodCall($field, $options);
 
             return $field;
         }, function () use ($name) {
