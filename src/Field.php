@@ -67,18 +67,22 @@ class Field
      * Add meta fields
      *
      * @param array $fields
-     * @return array|\Orchid\Screen\Field[]|Input|Select[]|TextArea
+     * @param false $taggableKeyword
+     * @return mixed
      */
-    public static function withMeta(array $fields)
+    public static function withMeta(array $fields, $taggableKeyword = false)
     {
         return array_merge($fields, [
             Input::make('meta_title')
                 ->type(Field::INPUT_TEXT)
                 ->title(__('Meta Title')),
-            Select::make('meta_keywords')
+            $taggableKeyword ? Select::make('meta_keywords')
                 ->title(__('Meta Keywords'))
                 ->multiple()
-                ->taggable(),
+                ->taggable() : TextArea::make('meta_keywords')
+                ->title(__('Meta Keywords'))
+                ->rows(4)
+                ->help(__('Separate keywords with commas')),
             TextArea::make('meta_description')
                 ->title(__('Meta Description'))
                 ->rows(4)
