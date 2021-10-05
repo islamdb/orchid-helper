@@ -146,7 +146,7 @@ class Column
      * @param string $filter
      * @return \Orchid\Screen\Cell|TD
      */
-    public static function make($name, $title = null, bool $sorting = true, string $filter = TD::FILTER_TEXT)
+    public static function make($name, $title = null, bool $sorting = true, $filter = TD::FILTER_TEXT)
     {
         $title = is_null($title)
             ? Str::title(str_replace('_', ' ', $name))
