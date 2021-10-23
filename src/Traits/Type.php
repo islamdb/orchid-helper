@@ -48,7 +48,7 @@ trait Type
      * @param string $glueColumn
      * @return mixed
      */
-    public static function relation(string $name, string $title = null, string $columns = 'name', string $glue = ', ', string $glueColumn = ' ')
+    public static function relation(string $name, string $title = null, $columns = 'name', string $glue = ', ', string $glueColumn = ' ')
     {
         $columns = is_array($columns)
             ? $columns
