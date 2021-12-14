@@ -99,6 +99,12 @@ trait Type
     {
         return static::make($name, $title)
             ->render(function ($model) use ($locale, $name, $withTime, $withDayName){
+                $dateTime = $model->{$name} ?? null;
+                
+                if (is_null($dateTime)) {
+                    return '';
+                }
+                
                 return Helper::readableDatetime($model->{$name}, $locale, $withTime, $withDayName);
             });
     }
