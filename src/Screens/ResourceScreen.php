@@ -123,7 +123,7 @@ class ResourceScreen extends Screen
                 ->method('addOrEdit')
                 ->asyncParameters([
                     'key' => $model->{$this->key},
-                ])->modalTitle(__('Edit') . $model->{$this->title}),
+                ])->modalTitle(__('Edit') . ' ' . $model->{$this->title}),
             Button::make(__('Delete'))
                 ->icon('trash')
                 ->method('delete')
