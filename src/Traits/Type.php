@@ -117,7 +117,7 @@ trait Type
         return static::make($name, $title)
             ->render(function ($model) use ($name, $decimalSeparator, $thousandSeparator, $zeroTrail, $decimals) {
                 $numeric = number_format(
-                    $model->{$name},
+                    $model->{$name} ?? 0,
                     $decimals,
                     $decimalSeparator,
                     $thousandSeparator
