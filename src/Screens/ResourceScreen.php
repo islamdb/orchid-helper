@@ -48,6 +48,7 @@ class ResourceScreen extends Screen
     {
         return [
             'list' => $this->modelView()
+                ->filters()
                 ->defaultSort($this->defaultSort)
                 ->paginate($this->perPage),
             'data' => new Repository([])
