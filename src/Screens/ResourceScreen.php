@@ -2,6 +2,7 @@
 
 namespace IslamDB\OrchidHelper\Screens;
 
+use Orchid\Attachment\Models\Attachment;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\ModalToggle;
@@ -28,6 +29,14 @@ class ResourceScreen extends Screen
     public $key = 'id';
 
     public $title = 'name';
+
+    /**
+     * Use to define which file column
+     * to save (in attachment)
+     *
+     * @var array
+     */
+    public $files = [];
 
     public function model()
     {
@@ -180,15 +189,18 @@ class ResourceScreen extends Screen
 
     public function onUpdate()
     {
-        $this->model()
+        $model = $this->model()
             ->where($this->key, request()->key)
-            ->first()
-            ->update(request()->data);
+            ->first();
+
+        $model->update(request()->data);
+
+        return $model;
     }
 
     public function onCreate()
     {
-        $this->model()->create(request()->data);
+        return $this->model()->create(request()->data);
     }
 
     public function onDelete()
@@ -198,15 +210,34 @@ class ResourceScreen extends Screen
             ->delete();
     }
 
+    public function saveAttachment($model)
+    {
+        $attachmentIds = [];
+        $files = [];
+        foreach ($this->files as $file) {
+            $ids = request()->input($file, []);
+            $files[$file] = $ids;
+            $ids = is_array($ids) ? $ids : [$ids];
+            $attachmentIds = array_merge($attachmentIds, $ids);
+        }
+
+        if (!empty($attachmentIds)) {
+            $model->attachment()
+                ->syncWithoutDetaching($attachmentIds);
+
+            $model->update($files);
+        }
+    }
+
     public function addOrEdit()
     {
         rescue(function () {
             if (!empty(request()->key)) {
-                $this->onUpdate();
+                $this->saveAttachment($this->onUpdate());
 
                 Alert::success(__('Saved'));
             } else {
-                $this->onCreate();
+                $this->saveAttachment($this->onCreate());
 
                 Alert::success(__('Saved'));
             }
