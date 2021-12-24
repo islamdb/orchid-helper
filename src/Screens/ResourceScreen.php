@@ -13,7 +13,7 @@ use Orchid\Screen\TD;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 
-class ResourceScreen extends Screen
+abstract class ResourceScreen extends Screen
 {
     /**
      * Display header name.
@@ -144,13 +144,16 @@ class ResourceScreen extends Screen
 
     public function asyncEditData($key = null)
     {
-        return !empty($key)
+        $data = !empty($key)
             ? [
                 'key' => $key,
                 'data' => $this->model()
-                    ->find($key)
+                    ->where($this->key, $key)
+                    ->first()
             ]
             : [];
+
+        return $data;
     }
 
     public function asyncViewData($key = null)
@@ -159,7 +162,8 @@ class ResourceScreen extends Screen
             ? [
                 'key' => $key,
                 'data' => $this->modelView()
-                    ->find($key)
+                    ->where($this->key, $key)
+                    ->first()
             ]
             : [];
 
@@ -231,6 +235,8 @@ class ResourceScreen extends Screen
 
     public function addOrEdit()
     {
+        $this->validate(request(), $this->rules());
+
         rescue(function () {
             if (!empty(request()->key)) {
                 $this->saveAttachment($this->onUpdate());
@@ -259,5 +265,12 @@ class ResourceScreen extends Screen
         }, function (\Throwable $e) {
             Alert::error(__('Failed') . '<br>' . $e->getMessage());
         });
+    }
+
+    public function rules()
+    {
+        return [
+
+        ];
     }
 }
