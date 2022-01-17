@@ -138,7 +138,7 @@ abstract class ResourceScreen extends Screen
                 ->icon('trash')
                 ->method('delete')
                 ->parameters(['key' => $model->{$this->key}])
-                ->confirm(__('Delete'))
+                ->confirm(__('Delete'). ' ' . $model->{$this->title})
         ];
     }
 
