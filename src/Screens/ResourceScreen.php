@@ -235,7 +235,11 @@ abstract class ResourceScreen extends Screen
 
     public function addOrEdit()
     {
-        $this->validate(request(), $this->rules());
+        $this->validate(
+            request(),
+            $this->rules(),
+            $this->messages()
+        );
 
         rescue(function () {
             if (!empty(request()->key)) {
@@ -267,10 +271,39 @@ abstract class ResourceScreen extends Screen
         });
     }
 
+    public function getRequiredFieldAttributes()
+    {
+        $attrs = [];
+        foreach ($this->fields() as $field) {
+            $required = $field->get('required');
+            if (!is_null($required)) {
+                $attrs[] = (object)[
+                    'name' => $field->get('name'),
+                    'title' => $field->get('title')
+                ];
+            }
+        }
+
+        return $attrs;
+    }
+
     public function rules()
     {
-        return [
+        $rules = [];
+        foreach ($this->getRequiredFieldAttributes() as $attr) {
+            $rules[$attr->name] = 'required';
+        }
 
-        ];
+        return $rules;
+    }
+
+    public function messages()
+    {
+        $messages = [];
+        foreach ($this->getRequiredFieldAttributes() as $attr) {
+            $messages[$attr->name.'.required'] = $attr->title.' is required.';
+        }
+
+        return $messages;
     }
 }
