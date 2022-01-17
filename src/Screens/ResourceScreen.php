@@ -76,7 +76,7 @@ abstract class ResourceScreen extends Screen
                 ->modal('addOrEditForm')
                 ->method('addOrEdit')
                 ->icon('plus')
-                ->modalTitle(__('Add') . $this->name)
+                ->modalTitle(__('Add') . ' ' . $this->name)
                 ->asyncParameters([
                     'key' => null
                 ])
@@ -301,7 +301,7 @@ abstract class ResourceScreen extends Screen
     {
         $messages = [];
         foreach ($this->getRequiredFieldAttributes() as $attr) {
-            $messages[$attr->name.'.required'] = $attr->title.' is required.';
+            $messages[$attr->name . '.required'] = $attr->title . ' is required.';
         }
 
         return $messages;
