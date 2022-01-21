@@ -18,8 +18,14 @@ trait Type
     {
         return static::make($name, $title)
             ->render(function ($model) use ($name, $target) {
+                $url = $model->{$name} ?? '';
+
+                if (empty($url)) {
+                    return '';
+                }
+
                 $link = Link::make($model->{$name})
-                    ->href($model->{$name});
+                    ->href();
 
                 return empty($target)
                     ? $link
@@ -36,7 +42,9 @@ trait Type
     {
         return static::make($name, $title)
             ->render(function ($model) use ($name) {
-                return $model->{$name};
+                $html = $model->{$name} ?? '';
+
+                return $html;
             });
     }
 
@@ -100,11 +108,11 @@ trait Type
         return static::make($name, $title)
             ->render(function ($model) use ($locale, $name, $withTime, $withDayName){
                 $dateTime = $model->{$name} ?? null;
-                
+
                 if (is_null($dateTime)) {
                     return '';
                 }
-                
+
                 return Helper::readableDatetime($model->{$name}, $locale, $withTime, $withDayName);
             });
     }
