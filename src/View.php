@@ -94,6 +94,12 @@ class View
 
         return static::make($name, $title)
             ->render(function ($model) use ($labels, $name) {
+                $index = $model->{$name} ?? '';
+
+                if (empty($index)) {
+                    return '';
+                }
+
                 return $labels[$model->{$name}];
             });
     }
