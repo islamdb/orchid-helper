@@ -70,20 +70,20 @@ class Field
      * @param false $taggableKeyword
      * @return mixed
      */
-    public static function withMeta(array $fields, $taggableKeyword = false)
+    public static function withMeta(array $fields, $prefix = '', $taggableKeyword = false)
     {
         return array_merge($fields, [
-            Input::make('meta_title')
+            Input::make($prefix.'meta_title')
                 ->type(Field::INPUT_TEXT)
                 ->title(__('Meta Title')),
-            $taggableKeyword ? Select::make('meta_keywords')
+            $taggableKeyword ? Select::make($prefix.'meta_keywords')
                 ->title(__('Meta Keywords'))
                 ->multiple()
-                ->taggable() : TextArea::make('meta_keywords')
+                ->taggable() : TextArea::make($prefix.'meta_keywords')
                 ->title(__('Meta Keywords'))
                 ->rows(4)
                 ->help(__('Separate keywords with commas')),
-            TextArea::make('meta_description')
+            TextArea::make($prefix.'meta_description')
                 ->title(__('Meta Description'))
                 ->rows(4)
         ]);
