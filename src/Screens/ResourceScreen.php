@@ -2,6 +2,7 @@
 
 namespace IslamDB\OrchidHelper\Screens;
 
+use Illuminate\Support\Str;
 use Orchid\Attachment\Models\Attachment;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\DropDown;
@@ -37,6 +38,19 @@ abstract class ResourceScreen extends Screen
      * @var array
      */
     public $files = [];
+
+    /**
+     * Use to define sluggable columns
+     *
+     * example :
+     * public $sluggables = [
+     *     'name' => 'slug',
+     *     'name' => 'code'
+     * ];
+     *
+     * @var array
+     */
+    public $sluggables = [];
 
     public function model()
     {
@@ -219,20 +233,31 @@ abstract class ResourceScreen extends Screen
         ];
     }
 
+    public function sluggable($data)
+    {
+        foreach ($this->sluggables as $column => $sluggable) {
+            if (empty($data[$sluggable])) {
+                $data[$sluggable] = Str::slug($data[$column]);   
+            }
+        }
+        
+        return $data;
+    }
+
     public function onUpdate()
     {
         $model = $this->model()
             ->where($this->key, request()->key)
             ->first();
 
-        $model->update(request()->data);
+        $model->update($this->sluggable(request()->data));
 
         return $model;
     }
 
     public function onCreate()
     {
-        return $this->model()->create(request()->data);
+        return $this->model()->create($this->sluggable(request()->data));
     }
 
     public function onDelete()
