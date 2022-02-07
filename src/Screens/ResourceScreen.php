@@ -142,6 +142,24 @@ abstract class ResourceScreen extends Screen
         ];
     }
 
+    public function asyncGetFiles($data, $key = null)
+    {
+        if (!empty($key) and !empty($this->files)) {
+            $attachments = $data['data']->attachment()
+                ->get();
+
+            foreach ($this->files as $file) {
+                $ids = $attachments->where('group', $file)
+                    ->pluck('id')
+                    ->toArray();
+
+                $data[$file] = $ids;
+            }
+        }
+
+        return $data;
+    }
+
     public function asyncEditData($key = null)
     {
         $data = !empty($key)
@@ -153,7 +171,7 @@ abstract class ResourceScreen extends Screen
             ]
             : [];
 
-        return $data;
+        return $this->asyncGetFiles($data, $key);
     }
 
     public function asyncViewData($key = null)
@@ -167,7 +185,7 @@ abstract class ResourceScreen extends Screen
             ]
             : [];
 
-        return $data;
+        return $this->asyncGetFiles($data, $key);
     }
 
     public function fields()
@@ -223,6 +241,12 @@ abstract class ResourceScreen extends Screen
             $files[$file] = $ids;
             $ids = is_array($ids) ? $ids : [$ids];
             $attachmentIds = array_merge($attachmentIds, $ids);
+
+            Attachment::query()
+                ->whereIn('id', $ids)
+                ->update([
+                    'group' => $file
+                ]);
         }
 
         if (!empty($attachmentIds)) {
