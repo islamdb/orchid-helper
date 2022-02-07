@@ -71,16 +71,21 @@ abstract class ResourceScreen extends Screen
      */
     public function commandBar(): array
     {
-        return [
-            ModalToggle::make(__('Add'))
-                ->modal('addOrEditForm')
-                ->method('addOrEdit')
-                ->icon('plus')
-                ->modalTitle(__('Add') . ' ' . $this->name)
-                ->asyncParameters([
-                    'key' => null
-                ])
-        ];
+        $commands = [];
+        if (!empty($this->fields())) {
+            $commands = [
+                ModalToggle::make(__('Add'))
+                    ->modal('addOrEditForm')
+                    ->method('addOrEdit')
+                    ->icon('plus')
+                    ->modalTitle(__('Add') . ' ' . $this->name)
+                    ->asyncParameters([
+                        'key' => null
+                    ])
+            ];
+        }
+
+        return $commands;
     }
 
     /**
@@ -120,26 +125,31 @@ abstract class ResourceScreen extends Screen
 
     public function actions($model)
     {
-        return [
-            ModalToggle::make(__('View'))
+        $actions = [];
+        if (!empty($this->views())) {
+            $actions[] = ModalToggle::make(__('View'))
                 ->icon('eye')
                 ->modal('viewModal')
                 ->asyncParameters([
                     'key' => $model->{$this->key}
-                ])->modalTitle($model->{$this->title}),
-            ModalToggle::make(__('Edit'))
+                ])->modalTitle($model->{$this->title});
+        }
+        if (!empty($this->fields())) {
+            $actions[] = ModalToggle::make(__('Edit'))
                 ->icon('note')
                 ->modal('addOrEditForm')
                 ->method('addOrEdit')
                 ->asyncParameters([
                     'key' => $model->{$this->key},
-                ])->modalTitle(__('Edit') . ' ' . $model->{$this->title}),
-            Button::make(__('Delete'))
-                ->icon('trash')
-                ->method('delete')
-                ->parameters(['key' => $model->{$this->key}])
-                ->confirm(__('Delete'). ' ' . $model->{$this->title})
-        ];
+                ])->modalTitle(__('Edit') . ' ' . $model->{$this->title});
+        }
+        $actions[] = Button::make(__('Delete'))
+            ->icon('trash')
+            ->method('delete')
+            ->parameters(['key' => $model->{$this->key}])
+            ->confirm(__('Delete'). ' ' . $model->{$this->title});
+
+        return $actions;
     }
 
     public function asyncGetFiles($data, $key = null)
