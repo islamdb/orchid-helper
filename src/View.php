@@ -6,6 +6,7 @@ namespace IslamDB\OrchidHelper;
 
 use Illuminate\Support\Str;
 use IslamDB\OrchidHelper\Traits\Type;
+use Orchid\Screen\Fields\Code;
 use Orchid\Screen\Sight;
 
 class View
@@ -101,6 +102,37 @@ class View
                 }
 
                 return $labels[$model->{$name}];
+            });
+    }
+
+    /**
+     * This function will help you to print out the code/json
+     * example :
+     * View::json('attrs')
+     * output :
+     * Code Field with its value
+     *
+     * @param $name
+     * @param null $title
+     * @param array|null $labels
+     * @return \Orchid\Screen\Cell|Sight
+     */
+    public static function code(string $name, string $title = null, $language = Code::JS)
+    {
+        return static::make($name, $title)
+            ->render(function ($model) use ($language) {
+                $json = $model->attrs ?? null;
+                $json = is_string($json)
+                    ? json_decode($json)
+                    : $json;
+
+                return Code::make()
+                    ->language(Code::JS)
+                    ->lineNumbers()
+                    ->readonly()
+                    ->value(json_encode($json, JSON_PRETTY_PRINT))
+                    ->render()
+                    ->render(); 
             });
     }
 
