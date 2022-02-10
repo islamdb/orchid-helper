@@ -132,7 +132,18 @@ class View
                     ->readonly()
                     ->value(json_encode($json, JSON_PRETTY_PRINT))
                     ->render()
-                    ->render(); 
+                    ->render();
+            });
+    }
+
+    public static function map(string $name, string $title = null)
+    {
+        return static::make($name, $title)
+            ->render(function ($model) {
+                $lat = $model->location['lat'] ?? 0;
+                $lng = $model->location['lng'] ?? 0;
+
+                return "<iframe width='100%' height='100%' id='mapcanvas' src='https://maps.google.com/maps?q=$lat,$lng&amp;t=&amp;z=18&amp;ie=UTF8&amp;iwloc=&amp;output=embed' frameborder='0' scrolling='no' marginheight='0' marginwidth='0'><div class='zxos8_gm'><a rel='bookmark'  href='https://downloadyou.tube/youtube-videos/'>youtube downloader</a></div><div style='overflow:hidden;'><div id='gmap_canvas' style='height:100%;width:100%;'></div></div><div><small>Powered by <a href='https://www.embedgooglemap.co.uk'>Embed Google Map</a></small></div></iframe>";
             });
     }
 
