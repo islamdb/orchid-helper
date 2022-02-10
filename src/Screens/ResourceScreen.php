@@ -25,6 +25,8 @@ abstract class ResourceScreen extends Screen
 
     public $defaultSort = 'created_at';
 
+    public $sortingDirection = 'desc';
+
     public $perPage = 10;
 
     public $key = 'id';
@@ -74,7 +76,7 @@ abstract class ResourceScreen extends Screen
         return [
             'list' => $this->modelView()
                 ->filters()
-                ->defaultSort($this->defaultSort)
+                ->defaultSort($this->defaultSort, $this->sortingDirection)
                 ->paginate($this->perPage),
             'data' => new Repository([])
         ];
