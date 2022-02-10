@@ -31,6 +31,8 @@ abstract class ResourceScreen extends Screen
 
     public $title = 'name';
 
+    public $defaultRequestValues = [];
+
     /**
      * Use to define which file column
      * to save (in attachment)
@@ -93,9 +95,9 @@ abstract class ResourceScreen extends Screen
                     ->method('addOrEdit')
                     ->icon('plus')
                     ->modalTitle(__('Add') . ' ' . $this->name)
-                    ->asyncParameters([
+                    ->asyncParameters(array_merge($this->defaultRequestValues, [
                         'key' => null
-                    ])
+                    ]))
             ];
         }
 
@@ -144,23 +146,25 @@ abstract class ResourceScreen extends Screen
             $actions[] = ModalToggle::make(__('View'))
                 ->icon('eye')
                 ->modal('viewModal')
-                ->asyncParameters([
+                ->asyncParameters(array_merge($this->defaultRequestValues, [
                     'key' => $model->{$this->key}
-                ])->modalTitle($model->{$this->title});
+                ]))->modalTitle($model->{$this->title});
         }
         if (!empty($this->fields())) {
             $actions[] = ModalToggle::make(__('Edit'))
                 ->icon('note')
                 ->modal('addOrEditForm')
                 ->method('addOrEdit')
-                ->asyncParameters([
-                    'key' => $model->{$this->key},
-                ])->modalTitle(__('Edit') . ' ' . $model->{$this->title});
+                ->asyncParameters(array_merge($this->defaultRequestValues, [
+                    'key' => $model->{$this->key}
+                ]))->modalTitle(__('Edit') . ' ' . $model->{$this->title});
         }
         $actions[] = Button::make(__('Delete'))
             ->icon('trash')
             ->method('delete')
-            ->parameters(['key' => $model->{$this->key}])
+            ->parameters(array_merge($this->defaultRequestValues, [
+                'key' => $model->{$this->key}
+            ]))
             ->confirm(__('Delete'). ' ' . $model->{$this->title});
 
         return $actions;
@@ -184,63 +188,58 @@ abstract class ResourceScreen extends Screen
         return $data;
     }
 
-    public function asyncEditData($key = null)
+    public function asyncEditData()
     {
-        $data = !empty($key)
+        $data = !empty(request()->key)
             ? [
-                'key' => $key,
+                'key' => request()->key,
                 'data' => $this->model()
-                    ->where($this->key, $key)
+                    ->where($this->key, request()->key)
                     ->first()
             ]
             : [];
+        $data = array_merge(request()->all(), $data);
 
-        return $this->asyncGetFiles($data, $key);
+        return $this->asyncGetFiles($data, request()->key);
     }
 
-    public function asyncViewData($key = null)
+    public function asyncViewData()
     {
-        $data = !empty($key)
+        $data = !empty(request()->key)
             ? [
-                'key' => $key,
+                'key' => request()->key,
                 'data' => $this->modelView()
-                    ->where($this->key, $key)
+                    ->where($this->key, request()->key)
                     ->first()
             ]
             : [];
 
-        return $this->asyncGetFiles($data, $key);
+        return $this->asyncGetFiles($data, request()->key);
     }
 
     public function fields()
     {
-        return [
-
-        ];
+        return [];
     }
 
     public function columns()
     {
-        return [
-
-        ];
+        return [];
     }
 
     public function views()
     {
-        return [
-
-        ];
+        return [];
     }
 
     public function sluggable($data)
     {
         foreach ($this->sluggables as $column => $sluggable) {
             if (empty($data[$sluggable])) {
-                $data[$sluggable] = Str::slug($data[$column]);   
+                $data[$sluggable] = Str::slug($data[$column]);
             }
         }
-        
+
         return $data;
     }
 
@@ -250,7 +249,9 @@ abstract class ResourceScreen extends Screen
             ->where($this->key, request()->key)
             ->first();
 
-        $model->update($this->sluggable(request()->data));
+        if (!empty($model)) {
+            $model->update($this->sluggable(request()->data));
+        }
 
         return $model;
     }
@@ -262,9 +263,15 @@ abstract class ResourceScreen extends Screen
 
     public function onDelete()
     {
-        $this->model()
+        $model = $this->model()
             ->where($this->key, request()->key)
-            ->delete();
+            ->first();
+
+        if (!empty($model)) {
+            $model->delete();
+        }
+
+        return $model;
     }
 
     public function saveAttachment($model)
