@@ -25,11 +25,11 @@ trait Type
                 }
 
                 $link = Link::make($model->{$name})
-                    ->href();
+                    ->href($url);
 
                 return empty($target)
-                    ? $link
-                    : $link->target($target);
+                    ? $link->render()->render()
+                    : $link->target($target)->render()->render();
             });
     }
 
@@ -143,6 +143,22 @@ trait Type
                 }
 
                 return $numeric;
+            });
+    }
+
+    /**
+     * @param string $name
+     * @param string|null $title
+     * @return mixed
+     */
+    public static function pre(string $name, string $title = null)
+    {
+        return static::make($name, $title)
+            ->render(function ($model) use ($name) {
+                $html = $model->{$name} ?? '';
+                $html = "<pre style='white-space: pre-wrap'>$html</pre>";
+
+                return $html;
             });
     }
 
