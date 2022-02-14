@@ -3,6 +3,7 @@
 namespace IslamDB\OrchidHelper\Traits;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use IslamDB\OrchidHelper\Helper;
 use Orchid\Screen\Actions\Link;
 
@@ -11,20 +12,22 @@ trait Type
     /**
      * @param string $name
      * @param string|null $title
+     * @param int $limit
      * @param string $target
      * @return mixed
+     * @throws \Throwable
      */
-    public static function url(string $name, string $title = null, string $target = '_blank')
+    public static function url(string $name, string $title = null, $limit = 50, string $target = '_blank')
     {
         return static::make($name, $title)
-            ->render(function ($model) use ($name, $target) {
+            ->render(function ($model) use ($name, $target, $limit) {
                 $url = $model->{$name} ?? '';
 
                 if (empty($url)) {
                     return '';
                 }
 
-                $link = Link::make($model->{$name})
+                $link = Link::make(Str::of($model->{$name})->limit($limit))
                     ->href($url);
 
                 return empty($target)
