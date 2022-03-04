@@ -344,7 +344,7 @@ abstract class ResourceScreen extends Screen
         $attrs = [];
         foreach ($this->fields() as $field) {
             $required = $field->get('required');
-            if (!is_null($required)) {
+            if (!is_null($required) && $required) {
                 $attrs[] = (object)[
                     'name' => $field->get('name'),
                     'title' => $field->get('title')
