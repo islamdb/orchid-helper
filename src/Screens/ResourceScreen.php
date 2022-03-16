@@ -97,6 +97,8 @@ abstract class ResourceScreen extends Screen
     public function commandBar(): array
     {
         $commands = [];
+        $request = request()->all();
+
         if (!empty($this->fields())) {
             $commands = [
                 ModalToggle::make(__('Add'))
