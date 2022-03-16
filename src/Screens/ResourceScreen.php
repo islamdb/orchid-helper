@@ -73,11 +73,18 @@ abstract class ResourceScreen extends Screen
      */
     public function query(): array
     {
+        $perPage = request()->perPage;
+        $this->perPage = $perPage != null ? $perPage : $this->perPage;
+
+        $list = $this->modelView()
+            ->filters()
+            ->defaultSort($this->defaultSort, $this->sortingDirection);
+        $list = str_contains($this->perPage, "-") ?
+            $list->get() :
+            $list->paginate($this->perPage);
+        
         return [
-            'list' => $this->modelView()
-                ->filters()
-                ->defaultSort($this->defaultSort, $this->sortingDirection)
-                ->paginate($this->perPage),
+            'list' => $list,
             'data' => new Repository([])
         ];
     }
@@ -99,11 +106,30 @@ abstract class ResourceScreen extends Screen
                     ->modalTitle(__('Add') . ' ' . $this->name)
                     ->asyncParameters(array_merge($this->defaultRequestValues, [
                         'key' => null
-                    ]))
+                    ])),
+                DropDown::make(__("Page"))
+                    ->list([
+                        Button::make("5")
+                            ->method('perPage', array_merge($request, ['perPage' => 5])),
+                        Button::make("10")
+                            ->method('perPage', array_merge($request, ['perPage' => 10])),
+                        Button::make("20")
+                            ->method('perPage', array_merge($request, ['perPage' => 20])),
+                        Button::make("50")
+                            ->method('perPage', array_merge($request, ['perPage' => 50])),
+                        Button::make(__("All"))
+                            ->method('perPage', array_merge($request, ['perPage' => -1])),
+                    ]),
             ];
         }
 
         return $commands;
+    }
+    
+    public function perPage($page)
+    {
+        $request = request();
+        return redirect()->route($request->route()->getName(), $request->except(['_token', 'page']));
     }
 
     /**
