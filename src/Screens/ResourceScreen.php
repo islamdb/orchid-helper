@@ -266,7 +266,12 @@ abstract class ResourceScreen extends Screen
     {
         foreach ($this->sluggables as $column => $sluggable) {
             if (empty($data[$sluggable])) {
-                $data[$sluggable] = Str::slug($data[$column]);
+                $slugValue = collect(explode('|', $column))
+                    ->map(function ($column) use ($data) {
+                        return $data[$column];
+                    })
+                    ->join(' ');
+                $data[$sluggable] = Str::slug($slugValue);
             }
         }
 
